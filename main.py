@@ -3,7 +3,7 @@ import time
 import app
 
 def main():
-    run = False
+    run = True
     cause = machine.reset_cause()
     if cause == machine.SOFT_RESET:
         print("main() BOOT: soft reset")

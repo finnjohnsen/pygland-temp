@@ -12,17 +12,28 @@ flash:
 
 ls:
 	mpr -d $(D) ls
+
 upload:
 	mpr -d $(D) put *.py /
+
 rm:
 	mpr -d $(D) rm --rf /
+
 rm-libs:
 	mpr -d $(D) rm --Rf /lib
 
 soft-reset:
 	mpr -d $(D) x
+
 sr: soft-reset
 
 reset:
 	mpr -d $(D) reboot
+
+deploy: rm flash
+	mpr -d $(D) put -r lib /
+	mpr -d $(D) put  -f app.py /app.py
+	mpr -d $(D) put  -f tempble.py /tempble.py
+	mpr -d $(D) put  -f main.py /main.py
+	mpr -d $(D) b
 
