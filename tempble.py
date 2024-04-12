@@ -13,8 +13,9 @@ class TempBLE:
     temp_char = aioble.Characteristic(temp_service, ENV_SENSE_TEMP_UUID, read=True, notify=True)
     hum_char = aioble.Characteristic(temp_service, ENV_SENSE_HUM_UUID, read=True, notify=True)
 
-    def __init__(self, name):
-        self.name=name
+    def __init__(self, name, connectionEvent):
+        self.name = name
+        self.connectionEvent = connectionEvent
 
     def updateCharacteristics(self, th):
         temp = int("{0:.0f}".format(th[0]*100))
@@ -25,10 +26,16 @@ class TempBLE:
     async def start(self):
         print("Starting BLE")
         aioble.register_services(self.temp_service)
-        self.connection = await aioble.advertise(
-            self.ADV_INTERVAL_US,
-            name = self.name,
-            services = [self.ENV_SENSE_UUID],
-            appearance = self.GENERIC_THERMOMETER,
-            manufacturer=(0xabcd, b"1234"),
-    )
+        while True:
+            async with await aioble.advertise(
+                self.ADV_INTERVAL_US,
+                name = self.name,
+                services = [self.ENV_SENSE_UUID],
+                appearance = self.GENERIC_THERMOMETER,
+                manufacturer=(0xabcd, b"1234")) as connection:
+                    print("Connected ", connection.device)
+                    self.connectionEvent.set()
+                    await connection.disconnected()
+                    self.connectionEvent.clear()
+                    print("Disconnected ", connection.device)
+        print("Advertise done")
