@@ -12,10 +12,16 @@ class App:
 
         self.i2c = I2C(0, scl=Pin(7), sda=Pin(6), freq=400000)
         self.sensor = sht31.SHT31(self.i2c, addr=0x44)
-        self.display = ssd1306.SSD1306_I2C(128, 32, self.i2c)
+        try:
+            self.display = ssd1306.SSD1306_I2C(128, 32, self.i2c)
+        except OSError:
+            print("No OLED")
+            self.display = None
         self.tempble = TempBLE(self.config["bleName"])
 
     def updateOLEDWithSensing(self, th):
+        if self.display == None:
+            return
         temp = "{0:.2f}".format(th[0])
         hum = "{0:.2f}".format(th[1])
         name = self.config['bleName']
@@ -41,6 +47,8 @@ class App:
             await asyncio.sleep_ms(self.config["updateIntervalMs"]["BLE"])
 
     def startDisplayMessage(self):
+        if self.display == None:
+            return
         self.display.fill(0)
         self.display.text('Starter...', 0, 0, 1)
         self.display.show()
