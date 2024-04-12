@@ -1,7 +1,7 @@
 {
     "bleName": "pytemp-dev-1",
     "updateIntervalMs": {
-        "OLED": 4000,
-        "BLE": 12000
+        "OLED": 1000,
+        "BLE": 10000
     }
 }
