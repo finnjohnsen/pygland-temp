@@ -13,8 +13,8 @@ class TempBLE:
     temp_char = aioble.Characteristic(temp_service, ENV_SENSE_TEMP_UUID, read=True, notify=True)
     hum_char = aioble.Characteristic(temp_service, ENV_SENSE_HUM_UUID, read=True, notify=True)
 
-    def __init__(self):
-        ""
+    def __init__(self, name):
+        self.name=name
 
     def updateCharacteristics(self, th):
         temp = int("{0:.0f}".format(th[0]*100))
@@ -27,8 +27,8 @@ class TempBLE:
         aioble.register_services(self.temp_service)
         self.connection = await aioble.advertise(
             self.ADV_INTERVAL_US,
-            name="pytemp-1",
-            services=[self.ENV_SENSE_UUID],
-            appearance=self.GENERIC_THERMOMETER,
+            name = self.name,
+            services = [self.ENV_SENSE_UUID],
+            appearance = self.GENERIC_THERMOMETER,
             manufacturer=(0xabcd, b"1234"),
     )

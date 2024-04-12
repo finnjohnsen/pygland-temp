@@ -34,6 +34,7 @@ deploy: rm flash
 	mpr -d $(D) put -r lib /
 	mpr -d $(D) put  -f app.py /app.py
 	mpr -d $(D) put  -f tempble.py /tempble.py
+	mpr -d $(D) put  -f config.json /config.json
 	mpr -d $(D) put  -f main.py /main.py
 	mpr -d $(D) b
 
