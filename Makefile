@@ -1,9 +1,10 @@
-.PHONY: flash rm deploy
 DEVICE=/dev/ttyACM0
 D=a0
+MPY_OUTPUT_DIR=mpy-out
 
 dependencies:
 	pipx install mpr
+	pipx install mpy-cross
 
 erase-flash:
 	esptool.py --chip esp32c3 --port $(DEVICE) erase_flash
@@ -31,14 +32,31 @@ sr: soft-reset
 
 reset:
 	mpr -d $(D) reboot
+	for file in $(find *.py); do mpy-cross $file -march=xtensawin; done
+	cd ../../
 
-deploy: flash rm
+deploy-dev: flash rm
 	mpr -d $(D) put -r lib /
-	mpr -d $(D) put  -f app.py /app.py
-	mpr -d $(D) put  -f tempble.py /tempble.py
-	mpr -d $(D) put  -f config.json /config.json
-	mpr -d $(D) put  -f main.py /main.py
+	mpr -d $(D) put -f app.py /app.py
+	mpr -d $(D) put -f tempble.py /tempble.py
+	mpr -d $(D) put -f config.json /config.json
+	mpr -d $(D) put -f main.py /main.py
 	mpr -d $(D) b
 
+APP_SRC 	= app.py tempble.py
+LIBS_SRC 	= lib/sht31.py lib/ssd1306.py
+LIB_AIOBLE_SRC  = lib/aioble/__init__.py lib/aioble/core.py lib/aioble/server.py lib/aioble/device.py
+ALL_SRC 	= $(APP_SRC) $(LIBS_SRC) $(LIB_AIOBLE_SRC)
+ALL_MPY 	= $(patsubst %.py, %.mpy, $(ALL_SRC))
 
+mk-required-path:
+	mkdir -p $(MPY_OUTPUT_DIR)/lib/aioble
 
+%.mpy: %.py
+	mpy-cross -march=xtensawin $< -o $(MPY_OUTPUT_DIR)/$@
+
+mpy_: $(ALL_MPY)
+
+mpy: mk-required-path mpy_
+
+.PHONY: flash rm deploy mpy a $(ALL_MPY_) $(ALL_SRC_) $(APP_SRC_) $(LIBS_SRC_)
