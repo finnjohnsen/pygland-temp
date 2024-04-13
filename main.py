@@ -12,8 +12,7 @@ def main():
     elif cause == machine.DEEPSLEEP_RESET:
         print("main() BOOT: deep sleep reset")
     elif cause == machine.PWRON_RESET:
-        print("main() BOOT: PWRON_RESET") # e.g. machine.PWRON_RESET
-        time.sleep(10)
+        print("main() BOOT: PWRON_RESET")
     elif cause == machine.WDT_RESET:
         print("main() BOOT: WDT_RESET")
     elif cause == machine.SOFT_RESET:
@@ -30,7 +29,5 @@ def main():
         mainApp.run()
     else:
         print("main() NOT Running App")
-
-
     print("main(): finished")
 main()
